@@ -59,8 +59,20 @@ for i in $(seq 1 $MAX_ITERATIONS); do
   echo "  Ralph Iteration $i of $MAX_ITERATIONS"
   echo "═══════════════════════════════════════════════════════"
   
-  # Run amp with the ralph prompt
-  OUTPUT=$(cat "$SCRIPT_DIR/prompt.md" | amp --dangerously-allow-all 2>&1 | tee /dev/stderr) || true
+  # Determine the agent command
+  AGENT_CMD=${RALPH_AGENT:-"gh copilot --allow-all-tools"}
+  
+  echo "Using Agent: $AGENT_CMD"
+  
+  # Run the agent with the prompt
+  if [[ "$AGENT_CMD" == *"gh copilot"* ]]; then
+    # For gh copilot we use the -p flag
+    PROMPT_TEXT=$(cat "$SCRIPT_DIR/prompt.md")
+    OUTPUT=$($AGENT_CMD --prompt "$PROMPT_TEXT" 2>&1 | tee /dev/stderr) || true
+  else
+    # For other agents we pipe the prompt
+    OUTPUT=$(cat "$SCRIPT_DIR/prompt.md" | $AGENT_CMD 2>&1 | tee /dev/stderr) || true
+  fi
   
   # Check for completion signal
   if echo "$OUTPUT" | grep -q "<promise>COMPLETE</promise>"; then

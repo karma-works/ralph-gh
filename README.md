@@ -10,7 +10,8 @@ Based on [Geoffrey Huntley's Ralph pattern](https://ghuntley.com/ralph/).
 
 ## Prerequisites
 
-- [Amp CLI](https://ampcode.com) installed and authenticated
+- [GitHub CLI (gh)](https://cli.github.com/) installed and the [Copilot extension](https://github.com/github/gh-copilot) installed (`gh extension install github/gh-copilot`)
+- [PowerShell](https://github.com/PowerShell/PowerShell) installed (macOS/Linux: `pwsh`, Windows: `powershell`)
 - `jq` installed (`brew install jq` on macOS)
 - A git repository for your project
 
@@ -21,33 +22,33 @@ Based on [Geoffrey Huntley's Ralph pattern](https://ghuntley.com/ralph/).
 Copy the ralph files into your project:
 
 ```bash
-# From your project root
+# From your project root (macOS/Linux)
 mkdir -p scripts/ralph
 cp /path/to/ralph/ralph.sh scripts/ralph/
+cp /path/to/ralph/ralph.ps1 scripts/ralph/
 cp /path/to/ralph/prompt.md scripts/ralph/
 chmod +x scripts/ralph/ralph.sh
+
+# From your project root (Windows PowerShell)
+New-Item -ItemType Directory -Path scripts\ralph -Force
+Copy-Item \path\to\ralph\ralph.sh scripts\ralph\
+Copy-Item \path\to\ralph\ralph.ps1 scripts\ralph\
+Copy-Item \path\to\ralph\prompt.md scripts\ralph\
 ```
 
-### Option 2: Install skills globally
+### Option 2: Use an alias or environment variable (RALPH_AGENT)
 
-Copy the skills to your Amp config for use across all projects:
+You can define which agent Ralph uses by setting the `RALPH_AGENT` environment variable. By default, it uses `gh copilot --allow-all-tools`.
 
 ```bash
-cp -r skills/prd ~/.config/amp/skills/
-cp -r skills/ralph ~/.config/amp/skills/
+# Bash example
+export RALPH_AGENT="gh copilot --allow-all-tools"
+
+# PowerShell example
+$env:RALPH_AGENT = "gh copilot --allow-all-tools"
 ```
 
-### Configure Amp auto-handoff (recommended)
-
-Add to `~/.config/amp/settings.json`:
-
-```json
-{
-  "amp.experimental.autoHandoff": { "context": 90 }
-}
-```
-
-This enables automatic handoff when context fills up, allowing Ralph to handle large stories that exceed a single context window.
+Ralph can handle large stories that exceed a single context window by breaking them into smaller, manageable user stories in `prd.json`.
 
 ## Workflow
 
@@ -74,7 +75,11 @@ This creates `prd.json` with user stories structured for autonomous execution.
 ### 3. Run Ralph
 
 ```bash
+# Bash
 ./scripts/ralph/ralph.sh [max_iterations]
+
+# PowerShell
+.\scripts\ralph\ralph.ps1 [max_iterations]
 ```
 
 Default is 10 iterations.
@@ -93,7 +98,8 @@ Ralph will:
 
 | File | Purpose |
 |------|---------|
-| `ralph.sh` | The bash loop that spawns fresh Amp instances |
+| `ralph.sh` | The bash loop that spawns fresh agent instances |
+| `ralph.ps1` | The PowerShell loop that spawns fresh agent instances |
 | `prompt.md` | Instructions given to each Amp instance |
 | `prd.json` | User stories with `passes` status (the task list) |
 | `prd.json.example` | Example PRD format for reference |
@@ -120,10 +126,11 @@ npm run dev
 
 ### Each Iteration = Fresh Context
 
-Each iteration spawns a **new Amp instance** with clean context. The only memory between iterations is:
 - Git history (commits from previous iterations)
 - `progress.txt` (learnings and context)
 - `prd.json` (which stories are done)
+
+Ralph works with any agentic CLI (defaults to GitHub Copilot CLI). You can swap the agent by setting the `RALPH_AGENT` environment variable.
 
 ### Small Tasks
 
@@ -158,7 +165,7 @@ Ralph only works if there are feedback loops:
 
 ### Browser Verification for UI Stories
 
-Frontend stories must include "Verify in browser using dev-browser skill" in acceptance criteria. Ralph will use the dev-browser skill to navigate to the page, interact with the UI, and confirm changes work.
+Frontend stories should include clear acceptance criteria. Ralph will use the agent to implement and verify changes. If your agent supports browser interaction (like certain custom agents or extensions), you can include "Verify in browser" in the criteria.
 
 ### Stop Condition
 
@@ -192,5 +199,5 @@ Ralph automatically archives previous runs when you start a new feature (differe
 
 ## References
 
+- [GitHub Copilot CLI](https://github.com/github/gh-copilot)
 - [Geoffrey Huntley's Ralph article](https://ghuntley.com/ralph/)
-- [Amp documentation](https://ampcode.com/manual)
