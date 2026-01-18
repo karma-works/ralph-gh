@@ -1,4 +1,4 @@
-# Ralph
+# Ralph (for copilot cli and claude)
 
 ![Ralph](ralph.webp)
 
