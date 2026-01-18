@@ -17,26 +17,36 @@ Based on [Geoffrey Huntley's Ralph pattern](https://ghuntley.com/ralph/).
 
 ## Setup
 
-### Option 1: Copy to your project
+### Option 1: Use the ralph-setup skill (Recommended)
+
+If you are using an agent that supports skills, you can automatically set up Ralph in your project:
+
+```
+Use the ralph-setup skill to set up the Ralph loop in this project.
+```
+
+### Option 2: Copy to your project manually
 
 Copy the ralph files into your project:
 
 ```bash
 # From your project root (macOS/Linux)
-mkdir -p scripts/ralph
-cp /path/to/ralph/ralph.sh scripts/ralph/
-cp /path/to/ralph/ralph.ps1 scripts/ralph/
-cp /path/to/ralph/prompt.md scripts/ralph/
-chmod +x scripts/ralph/ralph.sh
+mkdir -p ralph
+cp /path/to/ralph/ralph.sh ralph/
+cp /path/to/ralph/ralph.ps1 ralph/
+cp /path/to/ralph/prompt.md ralph/
+cp /path/to/ralph/AGENTS.md .
+chmod +x ralph/ralph.sh
 
 # From your project root (Windows PowerShell)
-New-Item -ItemType Directory -Path scripts\ralph -Force
-Copy-Item \path\to\ralph\ralph.sh scripts\ralph\
-Copy-Item \path\to\ralph\ralph.ps1 scripts\ralph\
-Copy-Item \path\to\ralph\prompt.md scripts\ralph\
+New-Item -ItemType Directory -Path ralph -Force
+Copy-Item \path\to\ralph\ralph.sh ralph\
+Copy-Item \path\to\ralph\ralph.ps1 ralph\
+Copy-Item \path\to\ralph\prompt.md ralph\
+Copy-Item \path\to\ralph\AGENTS.md .
 ```
 
-### Option 2: Use an alias or environment variable (RALPH_AGENT)
+### Option 3: Use an alias or environment variable (RALPH_AGENT)
 
 You can define which agent Ralph uses by setting the `RALPH_AGENT` environment variable. By default, it uses `gh copilot --allow-all-tools`.
 
@@ -76,10 +86,10 @@ This creates `prd.json` with user stories structured for autonomous execution.
 
 ```bash
 # Bash
-./scripts/ralph/ralph.sh [max_iterations]
+./ralph/ralph.sh [max_iterations]
 
 # PowerShell
-.\scripts\ralph\ralph.ps1 [max_iterations]
+.\ralph\ralph.ps1 [max_iterations]
 ```
 
 Default is 10 iterations.
@@ -106,6 +116,7 @@ Ralph will:
 | `progress.txt` | Append-only learnings for future iterations |
 | `skills/prd/` | Skill for generating PRDs |
 | `skills/ralph/` | Skill for converting PRDs to JSON |
+| `skills/ralph-setup/` | Skill for automatically setting up Ralph in a project |
 | `flowchart/` | Interactive visualization of how Ralph works |
 
 ## Critical Concepts
